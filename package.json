@@ -1,0 +1,10 @@
+{
+  "name": "clinicplus-rest-api",
+  "version": "1.0.0",
+  "description": "ClinicPlus Appointment Portal REST API (appointment booking and patient-safe data handling)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "bash test-endpoints.sh"
+  }
+}

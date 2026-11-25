@@ -1,0 +1,103 @@
+{
+  "info": {
+    "name": "ClinicPlus Appointment Portal REST API",
+    "_postman_id": "c7e09f4a-8d2a-4c31-9f31-728192837192",
+    "description": "4 REST endpoints for Clinic appointment booking and patient-safe data handling.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Get Doctor Slot Availability (200 OK)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/v1/doctors/doc_1024/availability?date=2026-12-01",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "doctors", "doc_1024", "availability"],
+          "query": [{ "key": "date", "value": "2026-12-01" }]
+        }
+      }
+    },
+    {
+      "name": "2. Book Appointment (201 Created)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Idempotency-Key", "value": "idem-booking-20261201-1000" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"patientId\": \"pat_88412\",\n  \"doctorId\": \"doc_1024\",\n  \"slotStart\": \"2026-12-01T10:00:00+05:30\",\n  \"visitType\": \"IN_PERSON\",\n  \"reasonForVisit\": \"Annual hypertension follow-up and blood pressure check\",\n  \"patientConsentAccepted\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/v1/appointments",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "appointments"]
+        }
+      }
+    },
+    {
+      "name": "2b. Error Case: Double-Booking Slot Conflict (409 Conflict)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"patientId\": \"pat_88412\",\n  \"doctorId\": \"doc_1024\",\n  \"slotStart\": \"2026-12-01T10:00:00+05:30\",\n  \"visitType\": \"TELEHEALTH\",\n  \"reasonForVisit\": \"Second overlapping booking attempt on same slot\",\n  \"patientConsentAccepted\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/v1/appointments",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "appointments"]
+        }
+      }
+    },
+    {
+      "name": "3. List Patient Appointments (Patient-Safe Redacted View)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.pat_88412" },
+          { "key": "X-Patient-Context", "value": "pat_88412" }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/api/v1/patients/pat_88412/appointments?status=CONFIRMED",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "patients", "pat_88412", "appointments"],
+          "query": [{ "key": "status", "value": "CONFIRMED" }]
+        }
+      }
+    },
+    {
+      "name": "4. Cancel Appointment (Soft-Cancel Lifecycle)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.pat_88412" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"patientId\": \"pat_88412\",\n  \"cancellationReason\": \"SCHEDULING_CONFLICT\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/v1/appointments/apt_90210/cancel",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "v1", "appointments", "apt_90210", "cancel"]
+        }
+      }
+    }
+  ]
+}

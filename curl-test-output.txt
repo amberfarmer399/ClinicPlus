@@ -1,0 +1,233 @@
+================================================================================
+TEST 1: GET /api/v1/doctors/doc_1024/availability?date=2026-12-01 (200 OK)
+================================================================================
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Cache-Control: no-store
+X-Content-Type-Options: nosniff
+Date: Wed, 25 Nov 2026 07:36:25 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{
+  "doctorId": "doc_1024",
+  "doctorName": "Dr. Ananya Sharma",
+  "specialty": "Cardiology",
+  "date": "2026-12-01",
+  "timezone": "Asia/Kolkata (+05:30)",
+  "slotDurationMinutes": 30,
+  "availableCount": 7,
+  "slots": [
+    {
+      "slotStart": "2026-12-01T09:00:00+05:30",
+      "slotEnd": "2026-12-01T09:30:00+05:30",
+      "available": true,
+      "supportedVisitTypes": [
+        "IN_PERSON",
+        "TELEHEALTH"
+      ]
+    },
+    {
+      "slotStart": "2026-12-01T09:30:00+05:30",
+      "slotEnd": "2026-12-01T10:00:00+05:30",
+      "available": false,
+      "supportedVisitTypes": [
+        "IN_PERSON",
+        "TELEHEALTH"
+      ]
+    },
+    {
+      "slotStart": "2026-12-01T10:00:00+05:30",
+      "slotEnd": "2026-12-01T10:30:00+05:30",
+      "available": true,
+      "supportedVisitTypes": [
+        "IN_PERSON",
+        "TELEHEALTH"
+      ]
+    },
+    {
+      "slotStart": "2026-12-01T10:30:00+05:30",
+      "slotEnd": "2026-12-01T11:00:00+05:30",
+      "available": true,
+      "supportedVisitTypes": [
+        "IN_PERSON",
+        "TELEHEALTH"
+      ]
+    },
+    {
+      "slotStart": "2026-12-01T11:00:00+05:30",
+      "slotEnd": "2026-12-01T11:30:00+05:30",
+      "available": true,
+      "supportedVisitTypes": [
+        "IN_PERSON",
+        "TELEHEALTH"
+      ]
+    },
+    {
+      "slotStart": "2026-12-01T14:00:00+05:30",
+      "slotEnd": "2026-12-01T14:30:00+05:30",
+      "available": true,
+      "supportedVisitTypes": [
+        "IN_PERSON",
+        "TELEHEALTH"
+      ]
+    },
+    {
+      "slotStart": "2026-12-01T14:30:00+05:30",
+      "slotEnd": "2026-12-01T15:00:00+05:30",
+      "available": true,
+      "supportedVisitTypes": [
+        "IN_PERSON",
+        "TELEHEALTH"
+      ]
+    },
+    {
+      "slotStart": "2026-12-01T15:00:00+05:30",
+      "slotEnd": "2026-12-01T15:30:00+05:30",
+      "available": true,
+      "supportedVisitTypes": [
+        "IN_PERSON",
+        "TELEHEALTH"
+      ]
+    }
+  ]
+}
+
+================================================================================
+TEST 2: POST /api/v1/appointments - Create Appointment (201 Created)
+================================================================================
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Cache-Control: no-store
+X-Content-Type-Options: nosniff
+Location: /api/v1/patients/pat_88412/appointments
+Date: Wed, 25 Nov 2026 07:36:25 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{
+  "appointmentId": "apt_90210",
+  "status": "CONFIRMED",
+  "doctor": {
+    "doctorId": "doc_1024",
+    "name": "Dr. Ananya Sharma",
+    "specialty": "Cardiology"
+  },
+  "patientSummary": {
+    "maskedPatientId": "***412",
+    "displayName": "Meera N."
+  },
+  "slotStart": "2026-12-01T10:00:00+05:30",
+  "slotEnd": "2026-12-01T10:30:00+05:30",
+  "visitType": "IN_PERSON",
+  "privacyNotice": "Clinical notes, reasonForVisit, and full PII are redacted in portal responses.",
+  "createdAt": "2026-11-25T07:36:25.119Z",
+  "updatedAt": "2026-11-25T07:36:25.119Z"
+}
+
+================================================================================
+TEST 3: POST /api/v1/appointments - Double-Booking Conflict Error (409 Conflict)
+================================================================================
+HTTP/1.1 409 Conflict
+Content-Type: application/json; charset=utf-8
+Cache-Control: no-store
+X-Content-Type-Options: nosniff
+Date: Wed, 25 Nov 2026 07:36:25 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{
+  "error": {
+    "code": "SLOT_ALREADY_BOOKED",
+    "message": "The requested practitioner time slot is no longer available.",
+    "status": 409,
+    "instance": "/api/v1/appointments",
+    "timestamp": "2026-11-25T07:36:25.133Z",
+    "details": [
+      {
+        "field": "slotStart",
+        "rejectedValue": "2026-12-01T10:00:00+05:30",
+        "issue": "Doctor doc_1024 already has a confirmed booking at 2026-12-01T10:00:00+05:30."
+      }
+    ]
+  }
+}
+
+================================================================================
+TEST 4: GET /api/v1/patients/pat_88412/appointments - Patient-Safe List (200 OK)
+================================================================================
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Cache-Control: no-store
+X-Content-Type-Options: nosniff
+Date: Wed, 25 Nov 2026 07:36:25 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{
+  "patientSummary": {
+    "maskedPatientId": "***412",
+    "displayName": "Meera N."
+  },
+  "totalCount": 1,
+  "data": [
+    {
+      "appointmentId": "apt_90210",
+      "status": "CONFIRMED",
+      "doctor": {
+        "doctorId": "doc_1024",
+        "name": "Dr. Ananya Sharma",
+        "specialty": "Cardiology"
+      },
+      "patientSummary": {
+        "maskedPatientId": "***412",
+        "displayName": "Meera N."
+      },
+      "slotStart": "2026-12-01T10:00:00+05:30",
+      "slotEnd": "2026-12-01T10:30:00+05:30",
+      "visitType": "IN_PERSON",
+      "privacyNotice": "Clinical notes, reasonForVisit, and full PII are redacted in portal responses.",
+      "createdAt": "2026-11-25T07:36:25.119Z",
+      "updatedAt": "2026-11-25T07:36:25.119Z"
+    }
+  ]
+}
+
+================================================================================
+TEST 5: PATCH /api/v1/appointments/apt_90210/cancel - Cancel Booking (200 OK)
+================================================================================
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Cache-Control: no-store
+X-Content-Type-Options: nosniff
+Date: Wed, 25 Nov 2026 07:36:25 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{
+  "appointmentId": "apt_90210",
+  "status": "CANCELLED",
+  "doctor": {
+    "doctorId": "doc_1024",
+    "name": "Dr. Ananya Sharma",
+    "specialty": "Cardiology"
+  },
+  "patientSummary": {
+    "maskedPatientId": "***412",
+    "displayName": "Meera N."
+  },
+  "slotStart": "2026-12-01T10:00:00+05:30",
+  "slotEnd": "2026-12-01T10:30:00+05:30",
+  "visitType": "IN_PERSON",
+  "privacyNotice": "Clinical notes, reasonForVisit, and full PII are redacted in portal responses.",
+  "createdAt": "2026-11-25T07:36:25.119Z",
+  "updatedAt": "2026-11-25T07:36:25.159Z",
+  "cancellationReason": "SCHEDULING_CONFLICT",
+  "cancelledAt": "2026-11-25T07:36:25.159Z"
+}
+
